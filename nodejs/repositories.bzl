@@ -246,12 +246,16 @@ filegroup(
 )
 filegroup(
   name = "npm_files",
-  srcs = glob(["bin/nodejs/**"]) + [":node_files"],
+  srcs = {npm_files_glob}[":node_files"],
 )
 """.format(
         node_bin_export = "\n  \"%s\"," % node_bin,
         npm_bin_export = "\n  \"%s\"," % npm_bin,
         npx_bin_export = "\n  \"%s\"," % npx_bin,
+        # NOTE(calebmer): Exclude dot files like `.DS_Store` added by MacOS. We
+        # observed remote caching issues where MacOS can't reuse a remote cache
+        # because of `.DS_Store` files in this rule.
+        npm_files_glob = "glob([\"bin/nodejs/**\"], exclude = [\"**/.*\"]) + ",
         node_bin_label = node_bin_label,
         npm_bin_label = npm_bin_label,
         npx_bin_label = npx_bin_label,
